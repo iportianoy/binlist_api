@@ -1,0 +1,3 @@
+X_API_KEY: binlist_api_token
+BINLIST_API_URL: https://lookup.binlist.net/
+CHECK_PROXY: False
