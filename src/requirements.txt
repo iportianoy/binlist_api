@@ -1,3 +1,5 @@
 asyncio
 aiohttp
 proxybroker
+pyyaml
+pathlib

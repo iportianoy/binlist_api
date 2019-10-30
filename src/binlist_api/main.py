@@ -34,7 +34,22 @@ async def get_cards(request):
         return web.json_response({'status_code': 403,
                                   'details': 'Forbidden'})
 
-    tasks = [get_card(card) for card in cards]
+    proxy_list = []
+
+    async def get_proxy(proxies):
+        while True:
+            proxy = await proxies.get()
+
+            if proxy is None:
+                break
+            proxy_list.append(str(proxy.host) + ':' + str(proxy.port))
+
+    proxies = asyncio.Queue()
+    broker = Broker(proxies)
+    await asyncio.gather(
+        broker.find(types=['HTTP'], limit=20), get_proxy(proxies))
+
+    tasks = [get_card(card, proxy_list) for card in cards]
 
     cards_with_info = await asyncio.gather(*tasks)
 

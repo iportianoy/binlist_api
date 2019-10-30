@@ -3,7 +3,7 @@ import urllib.request
 import urllib.error
 
 from aiohttp import ClientSession
-from proxyscrape import create_collector
+from random import choice
 
 from .config import CONFIG
 
@@ -13,25 +13,23 @@ logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(a
 
 BINLIST_API_URL = CONFIG.get('BINLIST_API_URL', None)
 CHECK_PROXY = bool(CONFIG.get('CHECK_PROXY', None))
-collector = create_collector('my-collector', 'http')
+
 session = ClientSession()
 
 
-async def get_card(card_number):
+async def get_card(card_number, proxy_list):
     """
     Make request to binlist API and get info about card
     :param card_number: str, first 8 numbers of card
     :param proxy_list: list, list of proxy servers
     :return: dict, info about card or error
     """
-    proxy = collector.get_proxy()
-    proxy = proxy.host + ':' + proxy.port
+    proxy = choice(proxy_list)
 
     if CHECK_PROXY:
         work_proxy = working_proxy(proxy)
         while not work_proxy:
-            proxy = collector.get_proxy()
-            proxy = proxy.host + ':' + proxy.port
+            proxy = choice(proxy_list)
             work_proxy = working_proxy(proxy)
 
     proxy = 'http://' + proxy
